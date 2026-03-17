@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vesper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:           #05070f;
+      --glass:        rgba(255,255,255,0.04);
+      --glass-hover:  rgba(255,255,255,0.07);
+      --border:       rgba(255,255,255,0.08);
+      --border-hi:    rgba(255,255,255,0.16);
+      --purple:       #a78bfa;
+      --amber:        #fbbf24;
+      --blue:         #60a5fa;
+      --green:        #34d399;
+      --red:          #f87171;
+      --t1:           #f1f5f9;
+      --t2:           #94a3b8;
+      --t3:           #475569;
+      --mono:         'JetBrains Mono', monospace;
+    }
+
+    /* ── RESET ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 15% 15%, rgba(167,139,250,.09) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 85%, rgba(251,191,36,.06)  0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%, rgba(96,165,250,.03)  0%, transparent 70%);
+      color: var(--t1);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLLBAR ───────────────────────────────────────── */
+    ::-webkit-scrollbar            { width: 5px; }
+    ::-webkit-scrollbar-track      { background: transparent; }
+    ::-webkit-scrollbar-thumb      { background: rgba(255,255,255,.1); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,.2); }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(5,7,15,.85);
+      backdrop-filter: blur(24px);
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .9rem; font-weight: 700;
+      letter-spacing: .2em; text-transform: uppercase;
+    }
+
+    .logo-orb {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, #fbbf24 0%, #a78bfa 55%, transparent 100%);
+      box-shadow: 0 0 18px rgba(167,139,250,.7), 0 0 40px rgba(251,191,36,.3);
+      animation: orb-pulse 4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes orb-pulse {
+      0%,100% { box-shadow: 0 0 18px rgba(167,139,250,.7), 0 0 40px rgba(251,191,36,.3); }
+      50%      { box-shadow: 0 0 28px rgba(167,139,250,1),  0 0 60px rgba(251,191,36,.5); }
+    }
+
+    .header-clock { text-align: right; }
+    #clock { font-family: var(--mono); font-size: 1.75rem; font-weight: 500; letter-spacing: .04em; }
+    #dateline { font-size: .72rem; color: var(--t2); letter-spacing: .06em; margin-top: 1px; }
+
+    /* ── DASHBOARD GRID ──────────────────────────────────── */
+    .dash {
+      display: grid;
+      grid-template-columns: 260px 1fr 300px;
+      grid-template-areas:
+        "weather  calendar  services"
+        "proxmox  proxmox   services"
+        "vms      vms       vms"
+        "feeds    feeds     feeds";
+      gap: 14px;
+      padding: 16px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* ── CARD ────────────────────────────────────────────── */
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .card:hover {
+      border-color: var(--border-hi);
+      box-shadow: 0 8px 32px rgba(0,0,0,.35);
+    }
+
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .card-label {
+      font-size: .68rem; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--t2);
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--purple);
+    }
+
+    /* ── GRID AREAS ──────────────────────────────────────── */
+    #weather-card  { grid-area: weather; }
+    #calendar-card { grid-area: calendar; }
+    #services-card { grid-area: services; }
+    #proxmox-card  { grid-area: proxmox; }
+    #vms-card      { grid-area: vms; }
+    #feeds-card    { grid-area: feeds; }
+
+    /* ── STATES ──────────────────────────────────────────── */
+    .loading {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--t3); font-size: .8rem;
+    }
+    .ld { width:6px;height:6px;border-radius:50%;background:var(--purple);animation:ldot 1.2s ease-in-out infinite; }
+    .ld:nth-child(2){animation-delay:.2s}
+    .ld:nth-child(3){animation-delay:.4s}
+    @keyframes ldot {
+      0%,60%,100%{transform:translateY(0);opacity:.35}
+      30%{transform:translateY(-6px);opacity:1}
+    }
+    .err   { font-size:.8rem;color:var(--red);background:rgba(248,113,113,.08);padding:8px 10px;border-radius:8px; }
+    .empty { font-size:.8rem;color:var(--t3);text-align:center;padding:20px 0; }
+
+    /* ── WEATHER ─────────────────────────────────────────── */
+    .w-main { display:flex;align-items:center;gap:10px;margin-bottom:12px; }
+    .w-icon { width:56px;height:56px; }
+    .w-temp { font-size:2.8rem;font-weight:300;line-height:1; }
+    .w-unit { font-size:1.1rem;color:var(--t2); }
+    .w-desc { font-size:.85rem;color:var(--t2);margin-bottom:12px; }
+    .w-meta { display:flex;gap:14px; }
+    .w-mi   { font-size:.72rem;color:var(--t3); }
+    .w-mi span { color:var(--t2);font-weight:500; }
+
+    /* ── CALENDAR ────────────────────────────────────────── */
+    .ev-list { display:flex;flex-direction:column;gap:7px; }
+    .ev {
+      display:flex;align-items:flex-start;gap:10px;
+      padding:9px 11px;
+      background:rgba(255,255,255,.03);
+      border-radius:10px;
+      border-left:2px solid var(--purple);
+    }
+    .ev-day-num  { font-size:1.05rem;font-weight:700;color:var(--purple);line-height:1; }
+    .ev-day-mon  { font-size:.6rem;text-transform:uppercase;color:var(--t3);letter-spacing:.05em; }
+    .ev-title    { font-size:.83rem;font-weight:500; }
+    .ev-time     { font-size:.7rem;color:var(--t2);font-family:var(--mono); }
+
+    /* ── SERVICES ────────────────────────────────────────── */
+    .svc {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:9px 11px;
+      background:rgba(255,255,255,.03);
+      border-radius:10px;
+      margin-bottom:7px;
+    }
+    .svc-name { font-size:.84rem;font-weight:500; }
+    .svc-right { display:flex;align-items:center;gap:6px;font-size:.7rem;font-family:var(--mono); }
+    .sdot { width:8px;height:8px;border-radius:50%; }
+    .sdot.up   { background:var(--green); box-shadow:0 0 7px rgba(52,211,153,.5); }
+    .sdot.down { background:var(--red);   box-shadow:0 0 7px rgba(248,113,113,.5); }
+    @keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+
+    /* ── PROXMOX NODE ────────────────────────────────────── */
+    .px-stats { display:grid;grid-template-columns:repeat(3,1fr);gap:12px; }
+    .px-stat { padding:13px;background:rgba(255,255,255,.03);border-radius:12px; }
+    .px-label {
+      font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;
+      color:var(--t3);margin-bottom:6px;
+    }
+    .px-val {
+      font-size:1.55rem;font-weight:600;font-family:var(--mono);margin-bottom:7px;
+    }
+    .bar { height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden; }
+    .bar-fill { height:100%;border-radius:2px;transition:width .6s ease; }
+    .bar-fill.cpu  { background:linear-gradient(90deg,var(--blue),var(--purple)); }
+    .bar-fill.ram  { background:linear-gradient(90deg,var(--purple),var(--amber)); }
+    .bar-fill.disk { background:linear-gradient(90deg,var(--green),var(--blue)); }
+    .px-sub { font-size:.68rem;color:var(--t3);margin-top:4px; }
+    .uptime-tag {
+      font-size:.67rem;font-family:var(--mono);
+      color:var(--green);background:rgba(52,211,153,.1);
+      padding:2px 8px;border-radius:20px;
+    }
+
+    /* ── VMs & CONTAINERS ────────────────────────────────── */
+    .vm-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(175px,1fr));
+      gap:9px;
+    }
+    .vm {
+      padding:11px 13px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:12px;
+    }
+    .vm-head { display:flex;align-items:center;justify-content:space-between;margin-bottom:7px; }
+    .vm-badge {
+      font-size:.58rem;font-weight:700;letter-spacing:.07em;
+      text-transform:uppercase;padding:2px 6px;border-radius:4px;
+    }
+    .vm-badge.vm  { background:rgba(96,165,250,.14);color:var(--blue); }
+    .vm-badge.lxc { background:rgba(167,139,250,.14);color:var(--purple); }
+    .vm-id { font-size:.67rem;color:var(--t3);font-family:var(--mono); }
+    .vm-name { font-size:.84rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px; }
+    .vm-status { display:flex;align-items:center;gap:5px;font-size:.7rem; }
+    .vdot { width:6px;height:6px;border-radius:50%; }
+    .vdot.running { background:var(--green); box-shadow:0 0 6px rgba(52,211,153,.5); }
+    .vdot.stopped { background:var(--t3); }
+    .vdot.paused  { background:var(--amber); }
+    .vm-bar { margin-top:7px;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden; }
+    .vm-bar-fill { height:100%;background:var(--purple);border-radius:2px; }
+
+    /* ── NEWS ────────────────────────────────────────────── */
+    .news-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(270px,1fr));
+      gap:9px;
+    }
+    a.news-item {
+      display:block;padding:11px 13px;
+      background:rgba(255,255,255,.03);
+      border-radius:10px;
+      text-decoration:none;color:inherit;
+      transition:background .15s;
+    }
+    a.news-item:hover { background:rgba(255,255,255,.07); }
+    .news-src   { font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:4px; }
+    .news-title { font-size:.81rem;font-weight:500;line-height:1.4;color:var(--t1); }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width:1100px) {
+      .dash {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+          "weather   calendar"
+          "proxmox   proxmox"
+          "services  services"
+          "vms       vms"
+          "feeds     feeds";
+      }
+    }
+    @media (max-width:640px) {
+      .dash {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "weather" "calendar" "proxmox"
+          "services" "vms" "feeds";
+      }
+      .px-stats { grid-template-columns:1fr; }
+      #clock { font-size:1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════ HEADER ════ -->
+<header>
+  <div class="logo">
+    <div class="logo-orb"></div>
+    <span>Vesper</span>
+  </div>
+  <div class="header-clock">
+    <div id="clock">--:--:--</div>
+    <div id="dateline">Loading…</div>
+  </div>
+</header>
+
+<!-- ════ DASHBOARD ════ -->
+<main class="dash">
+
+  <!-- WEATHER -->
+  <div class="card" id="weather-card">
+    <div class="card-head">
+      <span class="card-label">Weather</span>
+      <span class="dot" style="background:var(--blue)"></span>
+    </div>
+    <div id="weather-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="card" id="calendar-card">
+    <div class="card-head">
+      <span class="card-label">Upcoming Events</span>
+      <span class="dot" style="background:var(--amber)"></span>
+    </div>
+    <div id="calendar-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="card" id="services-card">
+    <div class="card-head">
+      <span class="card-label">Services</span>
+      <span class="dot" style="background:var(--green)"></span>
+    </div>
+    <div id="services-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+  </div>
+
+  <!-- PROXMOX NODE -->
+  <div class="card" id="proxmox-card">
+    <div class="card-head">
+      <span class="card-label">Proxmox Node</span>
+      <span id="uptime-tag" class="uptime-tag" style="display:none"></span>
+    </div>
+    <div id="proxmox-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+  </div>
+
+  <!-- VMs & CONTAINERS -->
+  <div class="card" id="vms-card">
+    <div class="card-head">
+      <span class="card-label">VMs &amp; Containers</span>
+      <span class="dot" style="background:var(--purple)"></span>
+    </div>
+    <div id="vms-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+  </div>
+
+  <!-- NEWS FEEDS -->
+  <div class="card" id="feeds-card">
+    <div class="card-head">
+      <span class="card-label">News &amp; Feeds</span>
+      <span class="dot" style="background:var(--amber)"></span>
+    </div>
+    <div id="feeds-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+  </div>
+
+</main>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════════════ */
+function fmtBytes(b) {
+  if (!b) return '0 B';
+  const k = 1024, sz = ['B','KB','MB','GB','TB'];
+  const i = Math.floor(Math.log(b) / Math.log(k));
+  return (b / Math.pow(k, i)).toFixed(1) + ' ' + sz[i];
+}
+
+function fmtUptime(s) {
+  const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
+  if (d > 0) return d + 'd ' + h + 'h';
+  if (h > 0) return h + 'h ' + m + 'm';
+  return m + 'm';
+}
+
+function pctColor(p) {
+  if (p < 60) return 'var(--green)';
+  if (p < 80) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+const ld = () => `<div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div>`;
+
+async function api(path) {
+  const r = await fetch('/api/' + path);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+/* ══════════════════════════════════════════════════════
+   CLOCK
+══════════════════════════════════════════════════════ */
+function tick() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-GB', { hour12: false });
+  document.getElementById('dateline').textContent =
+    now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+setInterval(tick, 1000);
+tick();
+
+/* ══════════════════════════════════════════════════════
+   WEATHER
+══════════════════════════════════════════════════════ */
+async function loadWeather() {
+  const el = document.getElementById('weather-body');
+  try {
+    const d = await api('weather');
+    if (d.status === 'unconfigured') {
+      el.innerHTML = `<div class="empty">Set <code>OPENWEATHER_API_KEY</code><br>in your .env file</div>`; return;
+    }
+    if (d.status === 'error') { el.innerHTML = `<div class="err">⚠ ${d.message}</div>`; return; }
+    el.innerHTML = `
+      <div class="w-main">
+        <img class="w-icon" src="${d.icon_url}" alt="${d.description}">
+        <div class="w-temp">${d.temp}<span class="w-unit">${d.unit}</span></div>
+      </div>
+      <div class="w-desc">${d.description} · ${d.city}</div>
+      <div class="w-meta">
+        <div class="w-mi">Feels like <span>${d.feels_like}${d.unit}</span></div>
+        <div class="w-mi">Humidity <span>${d.humidity}%</span></div>
+        <div class="w-mi">Wind <span>${d.wind_speed} m/s</span></div>
+      </div>`;
+  } catch(e) { el.innerHTML = `<div class="err">⚠ Could not reach weather API</div>`; }
+}
+
+/* ══════════════════════════════════════════════════════
+   CALENDAR
+══════════════════════════════════════════════════════ */
+async function loadCalendar() {
+  const el = document.getElementById('calendar-body');
+  try {
+    const d = await api('calendar');
+    if (d.status === 'unconfigured') {
+      el.innerHTML = `<div class="empty">Set <code>ICAL_URL</code> in your .env file</div>`; return;
+    }
+    if (d.status === 'error') { el.innerHTML = `<div class="err">⚠ ${d.message}</div>`; return; }
+    if (!d.events.length) { el.innerHTML = `<div class="empty">No events in the next 2 weeks</div>`; return; }
+    el.innerHTML = `<div class="ev-list">${d.events.map(ev => {
+      const dt = new Date(ev.start);
+      const day = dt.getDate();
+      const mon = dt.toLocaleString('en',{month:'short'});
+      const time = ev.all_day ? 'All day'
+        : dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="ev">
+        <div style="min-width:34px;text-align:center">
+          <div class="ev-day-num">${day}</div>
+          <div class="ev-day-mon">${mon}</div>
+        </div>
+        <div>
+          <div class="ev-title">${ev.title}</div>
+          <div class="ev-time">${time}${ev.location ? ' · ' + ev.location : ''}</div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  } catch(e) { el.innerHTML = `<div class="err">⚠ Could not load calendar</div>`; }
+}
+
+/* ══════════════════════════════════════════════════════
+   SERVICES
+══════════════════════════════════════════════════════ */
+async function loadServices() {
+  const el = document.getElementById('services-body');
+  try {
+    const d = await api('health');
+    if (d.status === 'unconfigured') {
+      el.innerHTML = `<div class="empty">Set <code>SERVICES</code> in your .env file</div>`; return;
+    }
+    if (!d.services.length) { el.innerHTML = `<div class="empty">No services configured</div>`; return; }
+    el.innerHTML = d.services.map(s => `
+      <div class="svc">
+        <span class="svc-name">${s.name}</span>
+        <div class="svc-right">
+          <div class="sdot ${s.status}"></div>
+          <span style="color:${s.status==='up'?'var(--green)':'var(--red)'}">
+            ${s.status === 'up' ? s.response_ms + ' ms' : (s.reason || 'down')}
+          </span>
+        </div>
+      </div>`).join('');
+  } catch(e) { el.innerHTML = `<div class="err">⚠ Could not reach health API</div>`; }
+}
+
+/* ══════════════════════════════════════════════════════
+   PROXMOX NODE
+══════════════════════════════════════════════════════ */
+async function loadProxmox() {
+  const el = document.getElementById('proxmox-body');
+  const tag = document.getElementById('uptime-tag');
+  try {
+    const d = await api('proxmox/node');
+    if (d.status === 'error') {
+      el.innerHTML = `<div class="err">⚠ ${d.message}</div>`; tag.style.display='none'; return;
+    }
+    tag.textContent = '↑ ' + fmtUptime(d.uptime);
+    tag.style.display = 'inline';
+    el.innerHTML = `<div class="px-stats">
+      <div class="px-stat">
+        <div class="px-label">CPU</div>
+        <div class="px-val" style="color:${pctColor(d.cpu)}">${d.cpu}<small style="font-size:.85rem">%</small></div>
+        <div class="bar"><div class="bar-fill cpu" style="width:${d.cpu}%"></div></div>
+      </div>
+      <div class="px-stat">
+        <div class="px-label">Memory</div>
+        <div class="px-val" style="color:${pctColor(d.memory.percent)}">${d.memory.percent}<small style="font-size:.85rem">%</small></div>
+        <div class="bar"><div class="bar-fill ram" style="width:${d.memory.percent}%"></div></div>
+        <div class="px-sub">${fmtBytes(d.memory.used)} / ${fmtBytes(d.memory.total)}</div>
+      </div>
+      <div class="px-stat">
+        <div class="px-label">Root Disk</div>
+        <div class="px-val" style="color:${pctColor(d.disk.percent)}">${d.disk.percent}<small style="font-size:.85rem">%</small></div>
+        <div class="bar"><div class="bar-fill disk" style="width:${d.disk.percent}%"></div></div>
+        <div class="px-sub">${fmtBytes(d.disk.used)} / ${fmtBytes(d.disk.total)}</div>
+      </div>
+    </div>`;
+  } catch(e) { el.innerHTML = `<div class="err">⚠ Could not reach Proxmox API</div>`; }
+}
+
+/* ══════════════════════════════════════════════════════
+   VMs & CONTAINERS
+══════════════════════════════════════════════════════ */
+async function loadVMs() {
+  const el = document.getElementById('vms-body');
+  try {
+    const d = await api('proxmox/vms');
+    if (d.status === 'error') { el.innerHTML = `<div class="err">⚠ ${d.message}</div>`; return; }
+    if (!d.vms.length) { el.innerHTML = `<div class="empty">No VMs or containers found</div>`; return; }
+    el.innerHTML = `<div class="vm-grid">${d.vms.map(vm => `
+      <div class="vm">
+        <div class="vm-head">
+          <span class="vm-badge ${vm.type}">${vm.type.toUpperCase()}</span>
+          <span class="vm-id">#${vm.id}</span>
+        </div>
+        <div class="vm-name">${vm.name}</div>
+        <div class="vm-status">
+          <div class="vdot ${vm.status}"></div>
+          <span style="color:var(--t2)">${vm.status}</span>
+          ${vm.status==='running' ? `<span style="color:var(--t3);margin-left:auto;font-size:.66rem;font-family:var(--mono)">${vm.cpu}% cpu</span>` : ''}
+        </div>
+        ${vm.status==='running' ? `<div class="vm-bar"><div class="vm-bar-fill" style="width:${Math.min(vm.cpu,100)}%"></div></div>` : ''}
+      </div>`).join('')}</div>`;
+  } catch(e) { el.innerHTML = `<div class="err">⚠ Could not load VM data</div>`; }
+}
+
+/* ══════════════════════════════════════════════════════
+   NEWS FEEDS
+══════════════════════════════════════════════════════ */
+async function loadFeeds() {
+  const el = document.getElementById('feeds-body');
+  try {
+    const d = await api('feeds');
+    if (d.status === 'unconfigured') {
+      el.innerHTML = `<div class="empty">Set <code>RSS_FEEDS</code> in your .env file</div>`; return;
+    }
+    if (!d.articles.length) { el.innerHTML = `<div class="empty">No articles loaded</div>`; return; }
+    el.innerHTML = `<div class="news-grid">${d.articles.map(a => `
+      <a class="news-item" href="${a.link}" target="_blank" rel="noopener">
+        <div class="news-src">${a.source}</div>
+        <div class="news-title">${a.title}</div>
+      </a>`).join('')}</div>`;
+  } catch(e) { el.innerHTML = `<div class="err">⚠ Could not load feeds</div>`; }
+}
+
+/* ══════════════════════════════════════════════════════
+   BOOT + REFRESH SCHEDULE
+══════════════════════════════════════════════════════ */
+loadWeather();
+loadCalendar();
+loadProxmox();
+loadVMs();
+loadServices();
+loadFeeds();
+
+setInterval(loadProxmox,   15_000);   // every 15 s
+setInterval(loadVMs,       30_000);   // every 30 s
+setInterval(loadServices,  30_000);   // every 30 s
+setInterval(loadWeather,  600_000);   // every 10 min
+setInterval(loadCalendar, 300_000);   // every  5 min
+setInterval(loadFeeds,   1800_000);   // every 30 min
+</script>
+</body>
+</html>
