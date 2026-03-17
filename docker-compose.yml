@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   vesper:
     build: .
@@ -8,7 +6,8 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - .env
+      - path: .env
+        required: false
     volumes:
       # Mount frontend for live edits without rebuilding
       - ./frontend:/app/frontend:ro
