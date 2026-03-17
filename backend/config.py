@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     # Service Health Checks (comma-separated Name=URL pairs)
     services: str = ""
 
+    # Gmail OAuth2 (see .env.example for setup steps)
+    gmail_client_id: str = ""
+    gmail_client_secret: str = ""
+    gmail_refresh_token: str = ""
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

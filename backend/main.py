@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routes import proxmox, weather, calendar, feeds, health
+from backend.routes import proxmox, weather, calendar, feeds, health, email
 
 app = FastAPI(title="Vesper Dashboard", version="1.0.0")
 
@@ -22,6 +22,7 @@ app.include_router(weather.router, prefix="/api")
 app.include_router(calendar.router, prefix="/api")
 app.include_router(feeds.router, prefix="/api")
 app.include_router(health.router, prefix="/api")
+app.include_router(email.router, prefix="/api")
 
 # Resolve frontend path relative to this file (works both locally and in Docker)
 FRONTEND_PATH = os.path.join(
