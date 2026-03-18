@@ -1,569 +1,838 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Vesper</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --bg:        #05070f;
-      --surface:   rgba(255,255,255,0.04);
-      --surface2:  rgba(255,255,255,0.07);
-      --border:    rgba(255,255,255,0.08);
-      --border-hi: rgba(255,255,255,0.15);
-      --blue:   #60a5fa;
-      --purple: #a78bfa;
-      --amber:  #fbbf24;
-      --green:  #34d399;
-      --red:    #f87171;
-      --t1: #f1f5f9;
-      --t2: #94a3b8;
-      --t3: #475569;
-      --mono: 'JetBrains Mono', monospace;
-    }
+  :root{
+    --bg:#05070f; --s1:rgba(255,255,255,.04); --s2:rgba(255,255,255,.08);
+    --b1:rgba(255,255,255,.07); --b2:rgba(255,255,255,.15);
+    --blue:#60a5fa; --purple:#a78bfa; --amber:#fbbf24;
+    --green:#34d399; --red:#f87171; --cyan:#22d3ee;
+    --t1:#f1f5f9; --t2:#94a3b8; --t3:#475569;
+    --mono:'JetBrains Mono',monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{height:100%}
+  body{height:100%;background:var(--bg);color:var(--t1);font-family:'Inter',sans-serif;display:flex;flex-direction:column;overflow:hidden}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background: var(--bg); color: var(--t1); font-family: 'Inter', sans-serif; overflow: hidden; display: flex; flex-direction: column; }
-    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+  /* ── HEADER ── */
+  header{
+    height:50px;flex-shrink:0;display:flex;align-items:center;gap:16px;padding:0 18px;
+    background:rgba(5,7,15,.95);border-bottom:1px solid var(--b1);backdrop-filter:blur(20px);z-index:200;
+  }
+  .logo{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;user-select:none}
+  .orb{width:20px;height:20px;border-radius:50%;flex-shrink:0;
+    background:radial-gradient(circle at 38% 38%,#fbbf24 0%,#a78bfa 55%,transparent 100%);
+    box-shadow:0 0 12px rgba(167,139,250,.8),0 0 24px rgba(251,191,36,.3);
+    animation:orb 4s ease-in-out infinite}
+  @keyframes orb{0%,100%{box-shadow:0 0 12px rgba(167,139,250,.8),0 0 24px rgba(251,191,36,.3)}50%{box-shadow:0 0 20px rgba(167,139,250,1),0 0 40px rgba(251,191,36,.5)}}
 
-    /* ─── HEADER ─────────────────────────────── */
-    header {
-      display: flex; align-items: center; gap: 20px;
-      padding: 0 20px; height: 52px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(5,7,15,.95); backdrop-filter: blur(20px);
-      flex-shrink: 0; z-index: 99;
-    }
-    .logo { display: flex; align-items: center; gap: 8px; font-size: .8rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
-    .orb {
-      width: 20px; height: 20px; border-radius: 50; flex-shrink: 0;
-      background: radial-gradient(circle at 40% 40%, #fbbf24 0%, #a78bfa 55%, transparent 100%);
-      box-shadow: 0 0 14px rgba(167,139,250,.8), 0 0 28px rgba(251,191,36,.3);
-      animation: orb 4s ease-in-out infinite; border-radius: 50%;
-    }
-    @keyframes orb { 0%,100%{box-shadow:0 0 14px rgba(167,139,250,.8),0 0 28px rgba(251,191,36,.3)} 50%{box-shadow:0 0 22px rgba(167,139,250,1),0 0 44px rgba(251,191,36,.5)} }
+  .tabs{display:flex;gap:2px;background:rgba(255,255,255,.05);border-radius:8px;padding:3px}
+  .tab{padding:5px 20px;border-radius:6px;border:none;font-family:inherit;font-size:.72rem;font-weight:600;
+    letter-spacing:.1em;text-transform:uppercase;cursor:pointer;color:var(--t3);background:transparent;transition:all .2s}
+  .tab:hover{color:var(--t2)}
+  .tab.tw{background:rgba(96,165,250,.15);color:var(--blue)}
+  .tab.tl{background:rgba(167,139,250,.15);color:var(--purple)}
 
-    /* TABS */
-    .tabs { display: flex; gap: 2px; background: rgba(255,255,255,.04); border-radius: 8px; padding: 3px; }
-    .tab {
-      padding: 5px 18px; border-radius: 6px; border: none;
-      font-family: 'Inter', sans-serif; font-size: .75rem; font-weight: 600;
-      letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
-      color: var(--t3); background: transparent; transition: all .2s;
-    }
-    .tab:hover { color: var(--t2); }
-    .tab.active-work   { background: rgba(96,165,250,.15);  color: var(--blue);   box-shadow: 0 0 12px rgba(96,165,250,.2); }
-    .tab.active-lab    { background: rgba(167,139,250,.15); color: var(--purple); box-shadow: 0 0 12px rgba(167,139,250,.2); }
+  .hright{margin-left:auto;display:flex;align-items:center;gap:12px}
+  #clock{font-family:var(--mono);font-size:1.3rem;font-weight:500;letter-spacing:.04em}
+  #dateline{font-size:.62rem;color:var(--t2);letter-spacing:.05em}
+  .gear-btn{background:none;border:none;cursor:pointer;color:var(--t3);font-size:1.1rem;
+    width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    transition:background .15s,color .15s}
+  .gear-btn:hover{background:var(--s2);color:var(--t1)}
 
-    .header-right { margin-left: auto; text-align: right; }
-    #clock    { font-family: var(--mono); font-size: 1.4rem; font-weight: 500; line-height: 1; }
-    #dateline { font-size: .62rem; color: var(--t2); letter-spacing: .06em; }
+  /* ── PAGES (fix: no display on #id rules) ── */
+  .page{display:none;flex:1;overflow-y:auto;overflow-x:hidden}
+  .page.active{display:block}
 
-    /* ─── PAGES ──────────────────────────────── */
-    .page { display: none; flex: 1; overflow: hidden; flex-direction: column; }
-    .page.active { display: flex; }
+  /* ══ WORK PAGE ══ */
+  #work-page{
+    background-image:radial-gradient(ellipse at 20% 0%,rgba(96,165,250,.07) 0%,transparent 50%);
+    padding:16px 20px;
+  }
+  .work-top{margin-bottom:14px}
+  .work-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 
-    /* ════════════════════════════════════════════
-       WORK PAGE
-    ════════════════════════════════════════════ */
-    #work-page {
-      background-image: radial-gradient(ellipse at 20% 20%, rgba(96,165,250,.06) 0%, transparent 55%);
-      overflow-y: auto; padding: 16px 20px; gap: 14px;
-    }
+  /* weather bar */
+  .wx-bar{
+    display:flex;align-items:center;gap:14px;padding:12px 16px;
+    background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.12);border-radius:13px;
+  }
+  .wx-icon{width:50px;height:50px}
+  .wx-temp{font-size:2.2rem;font-weight:300;line-height:1}
+  .wx-unit{font-size:.9rem;color:var(--t2)}
+  .wx-info{display:flex;flex-direction:column;gap:3px}
+  .wx-desc{font-size:.8rem;color:var(--t2)}
+  .wx-meta{display:flex;gap:12px}
+  .wx-mi{font-size:.67rem;color:var(--t3)}.wx-mi span{color:var(--t2)}
 
-    .work-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
+  /* cards */
+  .card{background:var(--s1);border:1px solid var(--b1);border-radius:13px;padding:14px 16px;transition:border-color .2s}
+  .card:hover{border-color:var(--b2)}
+  .card-title{font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--t3);
+    margin-bottom:12px;display:flex;align-items:center;gap:6px}
+  .card-title .dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 
-    /* weather full-width strip */
-    .weather-bar {
-      display: flex; align-items: center; gap: 16px;
-      padding: 12px 18px;
-      background: rgba(96,165,250,.06);
-      border: 1px solid rgba(96,165,250,.12);
-      border-radius: 12px;
-      margin-bottom: 0;
-    }
-    .wb-icon  { width: 52px; height: 52px; }
-    .wb-temp  { font-size: 2.4rem; font-weight: 300; line-height: 1; }
-    .wb-unit  { font-size: 1rem; color: var(--t2); }
-    .wb-info  { display: flex; flex-direction: column; gap: 3px; }
-    .wb-desc  { font-size: .82rem; color: var(--t2); }
-    .wb-meta  { display: flex; gap: 12px; }
-    .wb-mi    { font-size: .68rem; color: var(--t3); }
-    .wb-mi span { color: var(--t2); }
+  /* events */
+  .ev-list{display:flex;flex-direction:column;gap:6px}
+  .ev{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;
+    background:rgba(96,165,250,.04);border-left:2px solid var(--blue);border-radius:0 9px 9px 0}
+  .ev-d{min-width:28px;text-align:center}
+  .ev-dn{font-size:.95rem;font-weight:700;color:var(--blue);line-height:1}
+  .ev-dm{font-size:.55rem;text-transform:uppercase;color:var(--t3)}
+  .ev-title{font-size:.8rem;font-weight:500}
+  .ev-time{font-size:.66rem;color:var(--t2);font-family:var(--mono)}
 
-    /* cards */
-    .wcard {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 14px 16px;
-      transition: border-color .2s;
-    }
-    .wcard:hover { border-color: var(--border-hi); }
-    .wcard-title {
-      font-size: .62rem; font-weight: 700; letter-spacing: .14em;
-      text-transform: uppercase; color: var(--t3); margin-bottom: 12px;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .wcard-title::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-    .calendar-card .wcard-title::before { background: var(--blue); }
-    .email-card    .wcard-title::before { background: var(--amber); }
+  /* email */
+  .em-list{display:flex;flex-direction:column;gap:6px}
+  .em{padding:8px 11px;border-radius:9px;border:1px solid transparent;background:rgba(251,191,36,.03)}
+  .em.unread{border-color:rgba(251,191,36,.14)}
+  .em-from{font-size:.7rem;font-weight:600}
+  .em-subj{font-size:.77rem;color:var(--t2);margin-top:1px}
+  .em-date{font-size:.62rem;color:var(--t3);font-family:var(--mono);margin-top:2px}
 
-    /* calendar events */
-    .ev-list { display: flex; flex-direction: column; gap: 7px; }
-    .ev {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 9px 12px; background: rgba(96,165,250,.04);
-      border-left: 2px solid var(--blue); border-radius: 0 9px 9px 0;
-    }
-    .ev-date { min-width: 32px; text-align: center; }
-    .ev-d    { font-size: 1rem; font-weight: 700; color: var(--blue); line-height: 1; }
-    .ev-m    { font-size: .58rem; text-transform: uppercase; color: var(--t3); }
-    .ev-title{ font-size: .82rem; font-weight: 500; }
-    .ev-time { font-size: .68rem; color: var(--t2); font-family: var(--mono); }
+  /* todo */
+  .todo-input-row{display:flex;gap:8px;margin-bottom:10px}
+  .todo-input{
+    flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:8px;
+    padding:7px 11px;font-family:inherit;font-size:.8rem;color:var(--t1);outline:none;
+    transition:border-color .2s}
+  .todo-input:focus{border-color:var(--blue)}
+  .todo-input::placeholder{color:var(--t3)}
+  .todo-add{background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.25);
+    border-radius:8px;padding:7px 13px;color:var(--blue);font-family:inherit;
+    font-size:.75rem;font-weight:600;cursor:pointer;transition:background .15s}
+  .todo-add:hover{background:rgba(96,165,250,.25)}
+  .todo-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+  .todo-item:last-child{border-bottom:none}
+  .todo-cb{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--t3);
+    background:none;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .todo-cb.done{background:var(--green);border-color:var(--green)}
+  .todo-cb.done::after{content:'✓';font-size:.6rem;color:#000;font-weight:700}
+  .todo-text{flex:1;font-size:.8rem;cursor:pointer}
+  .todo-text.done{text-decoration:line-through;color:var(--t3)}
+  .todo-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:.9rem;padding:0 2px;
+    opacity:0;transition:opacity .15s}
+  .todo-item:hover .todo-del{opacity:1}
 
-    /* email */
-    .email-list { display: flex; flex-direction: column; gap: 7px; }
-    .em {
-      padding: 9px 12px;
-      background: rgba(251,191,36,.03);
-      border-radius: 9px; border: 1px solid transparent;
-    }
-    .em.unread { border-color: rgba(251,191,36,.15); }
-    .em-from    { font-size: .72rem; font-weight: 600; color: var(--t1); }
-    .em-subject { font-size: .78rem; color: var(--t2); margin-top: 2px; }
-    .em-date    { font-size: .62rem; color: var(--t3); font-family: var(--mono); margin-top: 3px; }
+  /* ══ HOMELAB PAGE ══ */
+  #lab-page{
+    background-image:radial-gradient(ellipse at 80% 0%,rgba(167,139,250,.07) 0%,transparent 50%);
+    padding:14px 18px;display:flex;flex-direction:column;gap:14px;
+  }
 
-    /* ════════════════════════════════════════════
-       HOMELAB PAGE
-    ════════════════════════════════════════════ */
-    #lab-page {
-      background-image: radial-gradient(ellipse at 80% 10%, rgba(167,139,250,.07) 0%, transparent 55%);
-      overflow-y: auto; padding: 14px 18px;
-      display: flex; flex-direction: column; gap: 14px;
-    }
+  /* gauges */
+  .gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .gauge-card{
+    background:var(--s1);border:1px solid var(--b1);border-radius:13px;
+    padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color .2s
+  }
+  .gauge-card:hover{border-color:var(--b2)}
+  .g-svg{width:64px;height:64px;flex-shrink:0}
+  .g-label{font-size:.58rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:3px}
+  .g-val{font-size:1.5rem;font-weight:600;font-family:var(--mono);line-height:1}
+  .g-sub{font-size:.62rem;color:var(--t3);margin-top:3px}
 
-    /* ── STAT GAUGES ROW ── */
-    .gauges-row {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
-    }
-    .gauge-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 14px; padding: 14px 16px;
-      display: flex; align-items: center; gap: 14px;
-      transition: border-color .2s;
-    }
-    .gauge-card:hover { border-color: var(--border-hi); }
-    .gauge-svg { width: 68px; height: 68px; flex-shrink: 0; }
-    .gauge-info { flex: 1; }
-    .gauge-label { font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--t3); margin-bottom: 4px; }
-    .gauge-val   { font-size: 1.6rem; font-weight: 600; font-family: var(--mono); line-height: 1; }
-    .gauge-sub   { font-size: .65rem; color: var(--t3); margin-top: 4px; }
+  /* section header */
+  .sec-title{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
 
-    /* ── SERVICES GRID ── */
-    .section-title {
-      font-size: .62rem; font-weight: 700; letter-spacing: .14em;
-      text-transform: uppercase; color: var(--t3); margin-bottom: 8px;
-    }
-    .services-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 8px;
-    }
-    .svc-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 12px 14px;
-      display: flex; align-items: center; gap: 10px;
-      transition: border-color .2s, background .2s;
-    }
-    .svc-card:hover { background: var(--surface2); border-color: var(--border-hi); }
-    .svc-icon {
-      width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .85rem; font-weight: 700; color: #fff;
-    }
-    .svc-info { flex: 1; min-width: 0; }
-    .svc-name { font-size: .78rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .svc-ms   { font-size: .65rem; font-family: var(--mono); margin-top: 2px; }
-    .svc-dot  { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .svc-dot.up   { background: var(--green); box-shadow: 0 0 6px rgba(52,211,153,.5); }
-    .svc-dot.down { background: var(--red);   box-shadow: 0 0 6px rgba(248,113,113,.5); }
+  /* service grid */
+  .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+  .svc-card{
+    background:var(--s1);border:1px solid var(--b1);border-radius:11px;
+    padding:10px 12px;display:flex;align-items:center;gap:9px;transition:all .15s;cursor:default;
+  }
+  .svc-card:hover{background:var(--s2);border-color:var(--b2)}
+  .svc-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff}
+  .svc-name{font-size:.77rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .svc-ms{font-size:.62rem;font-family:var(--mono);margin-top:1px}
+  .svc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-left:auto}
+  .svc-dot.up{background:var(--green);box-shadow:0 0 6px rgba(52,211,153,.5)}
+  .svc-dot.down{background:var(--red);box-shadow:0 0 6px rgba(248,113,113,.5)}
 
-    /* ── VMs TABLE ── */
-    .vm-table-wrap {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
-    }
-    .vm-table { width: 100%; border-collapse: collapse; }
-    .vm-table th {
-      font-size: .6rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
-      color: var(--t3); padding: 10px 14px; text-align: left;
-      border-bottom: 1px solid var(--border); background: rgba(255,255,255,.02);
-    }
-    .vm-table td { padding: 9px 14px; font-size: .8rem; border-bottom: 1px solid rgba(255,255,255,.03); vertical-align: middle; }
-    .vm-table tr:last-child td { border-bottom: none; }
-    .vm-table tr:hover td { background: rgba(255,255,255,.025); }
-    .type-badge {
-      font-size: .55rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-      padding: 2px 6px; border-radius: 4px;
-    }
-    .type-badge.vm  { background: rgba(96,165,250,.15);  color: var(--blue); }
-    .type-badge.lxc { background: rgba(167,139,250,.15); color: var(--purple); }
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: .72rem; font-family: var(--mono);
-    }
-    .vdot { width: 6px; height: 6px; border-radius: 50%; }
-    .vdot.running { background: var(--green); box-shadow: 0 0 5px rgba(52,211,153,.5); }
-    .vdot.stopped { background: var(--t3); }
-    .vdot.paused  { background: var(--amber); }
-    .mini-bar { width: 60px; height: 4px; background: rgba(255,255,255,.07); border-radius: 2px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
-    .mini-bar-fill { height: 100%; background: var(--purple); border-radius: 2px; }
+  /* vm table */
+  .vm-wrap{background:var(--s1);border:1px solid var(--b1);border-radius:13px;overflow:hidden}
+  .vm-tbl{width:100%;border-collapse:collapse}
+  .vm-tbl th{font-size:.58rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--t3);padding:9px 14px;text-align:left;border-bottom:1px solid var(--b1);background:rgba(255,255,255,.02)}
+  .vm-tbl td{padding:8px 14px;font-size:.79rem;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+  .vm-tbl tr:last-child td{border-bottom:none}
+  .vm-tbl tr:hover td{background:rgba(255,255,255,.025)}
+  .badge{font-size:.54rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px}
+  .badge.vm{background:rgba(96,165,250,.14);color:var(--blue)}
+  .badge.lxc{background:rgba(167,139,250,.14);color:var(--purple)}
+  .vpill{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-family:var(--mono)}
+  .vdot{width:6px;height:6px;border-radius:50%}
+  .vdot.running{background:var(--green);box-shadow:0 0 5px rgba(52,211,153,.5)}
+  .vdot.stopped{background:var(--t3)}.vdot.paused{background:var(--amber)}
+  .mbar{width:52px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;display:inline-block;vertical-align:middle;margin-left:5px;overflow:hidden}
+  .mbar-f{height:100%;background:var(--purple);border-radius:2px}
 
-    /* ── NEWS ── */
-    .news-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 8px;
-    }
-    a.news-card {
-      display: block; padding: 10px 13px;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 11px; text-decoration: none; color: inherit;
-      transition: background .15s, border-color .15s;
-    }
-    a.news-card:hover { background: var(--surface2); border-color: var(--border-hi); }
-    .news-src   { font-size: .6rem; text-transform: uppercase; letter-spacing: .1em; color: var(--amber); margin-bottom: 4px; }
-    .news-title { font-size: .79rem; font-weight: 500; line-height: 1.35; }
+  /* news */
+  .news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+  a.nc{display:block;padding:10px 13px;background:var(--s1);border:1px solid var(--b1);
+    border-radius:11px;text-decoration:none;color:inherit;transition:all .15s}
+  a.nc:hover{background:var(--s2);border-color:var(--b2)}
+  .nc-src{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);margin-bottom:3px}
+  .nc-title{font-size:.78rem;font-weight:500;line-height:1.35}
 
-    /* ── SHARED STATES ── */
-    .loading { display:flex;align-items:center;gap:5px;color:var(--t3);font-size:.77rem;padding:8px 0; }
-    .ld{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:ld 1.2s ease-in-out infinite;}
-    .ld:nth-child(2){animation-delay:.2s}.ld:nth-child(3){animation-delay:.4s}
-    @keyframes ld{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-5px);opacity:1}}
-    .err   { font-size:.75rem;color:var(--red);background:rgba(248,113,113,.07);padding:8px 10px;border-radius:8px; }
-    .empty { font-size:.75rem;color:var(--t3);padding:10px 0; }
-    code   { font-family:var(--mono);font-size:.7rem;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px; }
+  /* ── STATES ── */
+  .loading{display:flex;align-items:center;gap:5px;color:var(--t3);font-size:.75rem;padding:6px 0}
+  .ld{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:ld 1.2s ease-in-out infinite}
+  .ld:nth-child(2){animation-delay:.2s}.ld:nth-child(3){animation-delay:.4s}
+  @keyframes ld{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-5px);opacity:1}}
+  .err{font-size:.74rem;color:var(--red);background:rgba(248,113,113,.07);padding:7px 10px;border-radius:8px}
+  .uncfg{font-size:.74rem;color:var(--t3);padding:6px 0}
+  code{font-family:var(--mono);font-size:.7rem;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px}
 
-    /* responsive */
-    @media(max-width:900px){
-      html,body{overflow:auto}
-      .work-grid{grid-template-columns:1fr}
-      .gauges-row{grid-template-columns:1fr 1fr}
-    }
+  /* ══ SETTINGS PANEL ══ */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+    z-index:500;display:flex;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
+  .overlay.open{opacity:1;pointer-events:all}
+  .spanel{
+    width:460px;height:100%;background:#0d101f;border-left:1px solid var(--b1);
+    display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s ease;
+  }
+  .overlay.open .spanel{transform:translateX(0)}
+  .sp-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;border-bottom:1px solid var(--b1);flex-shrink:0;
+  }
+  .sp-title{font-size:.85rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .sp-close{background:none;border:none;color:var(--t2);font-size:1.3rem;cursor:pointer;
+    width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background .15s}
+  .sp-close:hover{background:var(--s2);color:var(--t1)}
+  .sp-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:20px}
+  .sp-footer{padding:14px 20px;border-top:1px solid var(--b1);flex-shrink:0;display:flex;gap:8px}
+
+  /* setting sections */
+  .ss{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden}
+  .ss-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s;
+  }
+  .ss-head:hover{background:var(--s2)}
+  .ss-head-left{display:flex;align-items:center;gap:10px}
+  .ss-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+  .ss-name{font-size:.78rem;font-weight:600}
+  .ss-status{font-size:.62rem;font-family:var(--mono)}
+  .ss-status.ok{color:var(--green)}.ss-status.no{color:var(--t3)}
+  .ss-arrow{color:var(--t3);font-size:.7rem;transition:transform .2s}
+  .ss-body{padding:0 16px 14px;display:flex;flex-direction:column;gap:8px;
+    max-height:0;overflow:hidden;transition:max-height .3s ease}
+  .ss-body.open{max-height:600px}
+
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+  .field input,.field select,.field textarea{
+    background:var(--s2);border:1px solid var(--b1);border-radius:8px;
+    padding:7px 10px;font-family:inherit;font-size:.79rem;color:var(--t1);outline:none;
+    transition:border-color .15s;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--purple)}
+  .field input::placeholder,.field textarea::placeholder{color:var(--t3)}
+  .field select option{background:#0d101f}
+  .field textarea{resize:vertical;min-height:70px;line-height:1.5}
+  .field .hint{font-size:.63rem;color:var(--t3);line-height:1.4}
+  .field .hint a{color:var(--blue);text-decoration:none}
+  .field .hint a:hover{text-decoration:underline}
+
+  /* buttons */
+  .btn-save{
+    flex:1;background:var(--purple);border:none;border-radius:9px;padding:10px;
+    font-family:inherit;font-size:.8rem;font-weight:600;color:#fff;cursor:pointer;
+    transition:opacity .15s;
+  }
+  .btn-save:hover{opacity:.85}
+  .btn-cancel{
+    background:none;border:1px solid var(--b1);border-radius:9px;padding:10px 18px;
+    font-family:inherit;font-size:.8rem;color:var(--t2);cursor:pointer;transition:background .15s
+  }
+  .btn-cancel:hover{background:var(--s2)}
+  .save-msg{font-size:.75rem;color:var(--green);align-self:center;display:none}
+
+  /* setup prompt */
+  .setup-prompt{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:12px;padding:40px;text-align:center;
+  }
+  .setup-prompt h2{font-size:1rem;font-weight:600;color:var(--t1)}
+  .setup-prompt p{font-size:.8rem;color:var(--t2);max-width:300px;line-height:1.5}
+  .btn-setup{
+    background:var(--purple);border:none;border-radius:10px;padding:10px 24px;
+    font-family:inherit;font-size:.8rem;font-weight:600;color:#fff;cursor:pointer;
+    transition:opacity .15s;margin-top:4px;
+  }
+  .btn-setup:hover{opacity:.85}
+
+  @media(max-width:900px){
+    body{overflow:auto}.page{overflow:visible}
+    .gauges{grid-template-columns:1fr 1fr}
+    .work-grid{grid-template-columns:1fr}
+    .spanel{width:100%}
+  }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header>
   <div class="logo"><div class="orb"></div><span>Vesper</span></div>
   <div class="tabs">
-    <button class="tab active-work" onclick="switchPage('work')">Work</button>
-    <button class="tab" onclick="switchPage('lab')">Homelab</button>
+    <button class="tab tw" onclick="nav('work')">Work</button>
+    <button class="tab"    onclick="nav('lab')">Homelab</button>
   </div>
-  <div class="header-right">
-    <div id="clock">--:--:--</div>
-    <div id="dateline">…</div>
+  <div class="hright">
+    <div>
+      <div id="clock">--:--:--</div>
+      <div id="dateline">…</div>
+    </div>
+    <button class="gear-btn" onclick="openSettings()" title="Settings">⚙</button>
   </div>
 </header>
 
-<!-- ═══ WORK PAGE ═══ -->
+<!-- ══ WORK PAGE ══ -->
 <div id="work-page" class="page active">
+  <div style="padding:16px 20px;display:flex;flex-direction:column;gap:14px">
 
-  <!-- Weather strip -->
-  <div id="weather-bar-wrap" style="padding:16px 20px 0">
-    <div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div>
-  </div>
+    <div id="wx-wrap"></div>
 
-  <div class="work-grid" style="padding:14px 20px 20px">
-
-    <!-- Calendar -->
-    <div class="wcard calendar-card">
-      <div class="wcard-title">Upcoming Events</div>
-      <div id="cal-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+    <div class="work-grid">
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--blue)"></span>Upcoming Events</div>
+        <div id="cal-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot" style="background:var(--amber)"></span>Inbox</div>
+        <div id="email-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+      </div>
     </div>
 
-    <!-- Email -->
-    <div class="wcard email-card">
-      <div class="wcard-title">Inbox</div>
-      <div id="email-body"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--green)"></span>To-Do</div>
+      <div class="todo-input-row">
+        <input class="todo-input" id="todo-input" placeholder="Add a task…" onkeydown="if(event.key==='Enter')addTodo()"/>
+        <button class="todo-add" onclick="addTodo()">Add</button>
+      </div>
+      <div id="todo-list"></div>
     </div>
 
   </div>
 </div>
 
-<!-- ═══ HOMELAB PAGE ═══ -->
+<!-- ══ HOMELAB PAGE ══ -->
 <div id="lab-page" class="page">
+  <div style="padding:14px 18px;display:flex;flex-direction:column;gap:14px">
 
-  <!-- Gauges -->
-  <div class="gauges-row" id="gauges-row">
-    <div class="gauge-card"><svg class="gauge-svg" id="g-cpu-svg"></svg><div class="gauge-info"><div class="gauge-label">CPU</div><div class="gauge-val" id="g-cpu-val">—</div><div class="gauge-sub" id="g-cpu-sub"></div></div></div>
-    <div class="gauge-card"><svg class="gauge-svg" id="g-ram-svg"></svg><div class="gauge-info"><div class="gauge-label">Memory</div><div class="gauge-val" id="g-ram-val">—</div><div class="gauge-sub" id="g-ram-sub"></div></div></div>
-    <div class="gauge-card"><svg class="gauge-svg" id="g-disk-svg"></svg><div class="gauge-info"><div class="gauge-label">Root Disk</div><div class="gauge-val" id="g-disk-val">—</div><div class="gauge-sub" id="g-disk-sub"></div></div></div>
-    <div class="gauge-card"><svg class="gauge-svg" id="g-up-svg"></svg><div class="gauge-info"><div class="gauge-label">Uptime</div><div class="gauge-val" id="g-up-val">—</div><div class="gauge-sub" id="g-up-sub" style="color:var(--green)"></div></div></div>
+    <div class="gauges">
+      <div class="gauge-card"><svg class="g-svg" id="gc1"></svg><div><div class="g-label">CPU</div><div class="g-val" id="gv1" style="color:var(--green)">—</div><div class="g-sub" id="gs1"></div></div></div>
+      <div class="gauge-card"><svg class="g-svg" id="gc2"></svg><div><div class="g-label">Memory</div><div class="g-val" id="gv2" style="color:var(--green)">—</div><div class="g-sub" id="gs2"></div></div></div>
+      <div class="gauge-card"><svg class="g-svg" id="gc3"></svg><div><div class="g-label">Root Disk</div><div class="g-val" id="gv3" style="color:var(--green)">—</div><div class="g-sub" id="gs3"></div></div></div>
+      <div class="gauge-card"><svg class="g-svg" id="gc4"></svg><div><div class="g-label">Uptime</div><div class="g-val" id="gv4" style="color:var(--green)">—</div><div class="g-sub" id="gs4" style="color:var(--green)"></div></div></div>
+    </div>
+
+    <div>
+      <div class="sec-title">Services</div>
+      <div id="svc-grid"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+    </div>
+
+    <div>
+      <div class="sec-title">VMs &amp; Containers</div>
+      <div id="vm-wrap"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+    </div>
+
+    <div>
+      <div class="sec-title">News &amp; Feeds</div>
+      <div id="news-grid"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+    </div>
+
   </div>
+</div>
 
-  <!-- Services -->
-  <div>
-    <div class="section-title">Services</div>
-    <div id="svc-grid"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+<!-- ══ SETTINGS OVERLAY ══ -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeSettings()">
+<div class="spanel">
+  <div class="sp-header">
+    <span class="sp-title">⚙ Settings</span>
+    <button class="sp-close" onclick="closeSettings()">✕</button>
   </div>
+  <div class="sp-body">
 
-  <!-- VMs & Containers -->
-  <div>
-    <div class="section-title">VMs &amp; Containers</div>
-    <div id="vm-table-wrap"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+    <!-- PROXMOX -->
+    <div class="ss" id="ss-proxmox">
+      <div class="ss-head" onclick="toggleSection('proxmox')">
+        <div class="ss-head-left">
+          <div class="ss-icon" style="background:rgba(251,191,36,.15);color:var(--amber)">🖥</div>
+          <div>
+            <div class="ss-name">Proxmox</div>
+            <div class="ss-status no" id="st-proxmox">Not configured</div>
+          </div>
+        </div>
+        <span class="ss-arrow" id="ar-proxmox">▶</span>
+      </div>
+      <div class="ss-body" id="sb-proxmox">
+        <div class="field"><label>Host / IP</label><input id="px-host" placeholder="192.168.1.100"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="field"><label>Port</label><input id="px-port" placeholder="8006"/></div>
+          <div class="field"><label>Node Name</label><input id="px-node" placeholder="pve"/></div>
+        </div>
+        <div class="field"><label>Username</label><input id="px-user" placeholder="root@pam"/></div>
+        <div class="field"><label>Password</label><input id="px-pass" type="password" placeholder="••••••••"/></div>
+        <div class="field">
+          <label>SSL Verification</label>
+          <select id="px-ssl">
+            <option value="false">Disabled (recommended for homelab)</option>
+            <option value="true">Enabled</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEATHER -->
+    <div class="ss" id="ss-weather">
+      <div class="ss-head" onclick="toggleSection('weather')">
+        <div class="ss-head-left">
+          <div class="ss-icon" style="background:rgba(96,165,250,.15);color:var(--blue)">🌤</div>
+          <div>
+            <div class="ss-name">Weather</div>
+            <div class="ss-status no" id="st-weather">Not configured</div>
+          </div>
+        </div>
+        <span class="ss-arrow" id="ar-weather">▶</span>
+      </div>
+      <div class="ss-body" id="sb-weather">
+        <div class="field">
+          <label>OpenWeatherMap API Key</label>
+          <input id="wx-key" placeholder="Get free key at openweathermap.org"/>
+          <div class="hint">Free at <a href="https://openweathermap.org/api" target="_blank">openweathermap.org/api</a></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="field"><label>City</label><input id="wx-city" placeholder="London"/></div>
+          <div class="field"><label>Units</label>
+            <select id="wx-units">
+              <option value="metric">Metric (°C)</option>
+              <option value="imperial">Imperial (°F)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="ss">
+      <div class="ss-head" onclick="toggleSection('calendar')">
+        <div class="ss-head-left">
+          <div class="ss-icon" style="background:rgba(52,211,153,.15);color:var(--green)">📅</div>
+          <div>
+            <div class="ss-name">Calendar</div>
+            <div class="ss-status no" id="st-calendar">Not configured</div>
+          </div>
+        </div>
+        <span class="ss-arrow" id="ar-calendar">▶</span>
+      </div>
+      <div class="ss-body" id="sb-calendar">
+        <div class="field">
+          <label>Google Calendar iCal URL</label>
+          <input id="cal-url" placeholder="https://calendar.google.com/calendar/ical/…"/>
+          <div class="hint">Google Calendar → Settings → your calendar → <em>Secret address in iCal format</em></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="ss">
+      <div class="ss-head" onclick="toggleSection('services')">
+        <div class="ss-head-left">
+          <div class="ss-icon" style="background:rgba(34,211,238,.15);color:var(--cyan)">⬡</div>
+          <div>
+            <div class="ss-name">Services</div>
+            <div class="ss-status no" id="st-services">Not configured</div>
+          </div>
+        </div>
+        <span class="ss-arrow" id="ar-services">▶</span>
+      </div>
+      <div class="ss-body" id="sb-services">
+        <div class="field">
+          <label>Services (Name=URL, one per line or comma-separated)</label>
+          <textarea id="svc-list" placeholder="Proxmox=https://192.168.1.100:8006&#10;Portainer=http://192.168.1.100:9000&#10;Plex=http://192.168.1.100:32400"></textarea>
+          <div class="hint">Each service will show as a card with live up/down status and response time.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RSS FEEDS -->
+    <div class="ss">
+      <div class="ss-head" onclick="toggleSection('feeds')">
+        <div class="ss-head-left">
+          <div class="ss-icon" style="background:rgba(251,191,36,.15);color:var(--amber)">📰</div>
+          <div>
+            <div class="ss-name">News Feeds</div>
+            <div class="ss-status no" id="st-feeds">Not configured</div>
+          </div>
+        </div>
+        <span class="ss-arrow" id="ar-feeds">▶</span>
+      </div>
+      <div class="ss-body" id="sb-feeds">
+        <div class="field">
+          <label>RSS Feed URLs (comma-separated)</label>
+          <textarea id="rss-urls" placeholder="https://feeds.bbci.co.uk/news/technology/rss.xml,&#10;https://www.theregister.com/headlines.atom"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- GMAIL -->
+    <div class="ss">
+      <div class="ss-head" onclick="toggleSection('gmail')">
+        <div class="ss-head-left">
+          <div class="ss-icon" style="background:rgba(248,113,113,.15);color:var(--red)">✉</div>
+          <div>
+            <div class="ss-name">Gmail (Inbox)</div>
+            <div class="ss-status no" id="st-gmail">Not configured</div>
+          </div>
+        </div>
+        <span class="ss-arrow" id="ar-gmail">▶</span>
+      </div>
+      <div class="ss-body" id="sb-gmail">
+        <div class="field">
+          <div class="hint" style="margin-bottom:6px">
+            1. <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → New project → Enable Gmail API<br>
+            2. OAuth 2.0 Credentials → Desktop app → Download JSON<br>
+            3. Run: <code>pip install google-auth-oauthlib</code> then the script in .env.example<br>
+            4. Paste the three values below
+          </div>
+        </div>
+        <div class="field"><label>Client ID</label><input id="gm-id" placeholder="…apps.googleusercontent.com"/></div>
+        <div class="field"><label>Client Secret</label><input id="gm-sec" type="password" placeholder="••••••••"/></div>
+        <div class="field"><label>Refresh Token</label><input id="gm-tok" type="password" placeholder="••••••••"/></div>
+      </div>
+    </div>
+
   </div>
-
-  <!-- News -->
-  <div>
-    <div class="section-title">News &amp; Feeds</div>
-    <div id="news-grid"><div class="loading"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+  <div class="sp-footer">
+    <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
+    <button class="btn-save" onclick="saveSettings()">Save Settings</button>
+    <span class="save-msg" id="save-msg">✓ Saved</span>
   </div>
-
-</div><!-- end lab-page -->
+</div>
+</div>
 
 <script>
-/* ── PAGE SWITCH ── */
-let currentPage = 'work';
-function switchPage(p) {
-  currentPage = p;
-  document.getElementById('work-page').classList.toggle('active', p==='work');
-  document.getElementById('lab-page').classList.toggle('active',  p==='lab');
-  const tabs = document.querySelectorAll('.tab');
-  tabs[0].className = 'tab' + (p==='work' ? ' active-work' : '');
-  tabs[1].className = 'tab' + (p==='lab'  ? ' active-lab'  : '');
-}
-
 /* ── CLOCK ── */
-function tick() {
-  const n = new Date();
-  document.getElementById('clock').textContent = n.toLocaleTimeString('en-GB',{hour12:false});
-  document.getElementById('dateline').textContent = n.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function tick(){
+  const n=new Date();
+  document.getElementById('clock').textContent=n.toLocaleTimeString('en-GB',{hour12:false});
+  document.getElementById('dateline').textContent=n.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
-setInterval(tick,1000); tick();
+setInterval(tick,1000);tick();
+
+/* ── NAV ── */
+function nav(p){
+  document.getElementById('work-page').classList.toggle('active',p==='work');
+  document.getElementById('lab-page').classList.toggle('active',p==='lab');
+  const tabs=document.querySelectorAll('.tab');
+  tabs[0].className='tab'+(p==='work'?' tw':'');
+  tabs[1].className='tab'+(p==='lab'?' tl':'');
+}
 
 /* ── API ── */
-async function api(path) {
-  const r = await fetch('/api/'+path);
-  if (!r.ok) throw new Error('HTTP '+r.status);
+async function api(path,opts){
+  const r=await fetch('/api/'+path,opts);
+  if(!r.ok) throw new Error('HTTP '+r.status);
   return r.json();
 }
 
 /* ── UTILS ── */
 function fmtBytes(b){if(!b)return'0 B';const k=1024,s=['B','KB','MB','GB','TB'],i=Math.floor(Math.log(b)/Math.log(k));return(b/Math.pow(k,i)).toFixed(1)+' '+s[i];}
-function fmtUptime(s){const d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60);return d>0?`${d}d ${h}h`:h>0?`${h}h ${m}m`:`${m}m`;}
+function fmtUp(s){const d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60);return d>0?`${d}d ${h}h`:h>0?`${h}h ${m}m`:`${m}m`;}
 function pctColor(p){return p<60?'var(--green)':p<80?'var(--amber)':'var(--red)';}
+function svcColor(n){const c=['#6366f1','#8b5cf6','#06b6d4','#10b981','#f59e0b','#3b82f6','#ec4899','#84cc16','#f97316','#ef4444'];let h=0;for(const ch of n)h=(h*31+ch.charCodeAt(0))&0xffff;return c[h%c.length];}
 
 /* ── SVG GAUGE ── */
-function drawGauge(svgId, pct, color) {
-  const svg = document.getElementById(svgId);
-  if (!svg) return;
-  const r = 28, cx = 34, cy = 34, circ = 2 * Math.PI * r;
-  const filled = circ * Math.min(pct, 100) / 100;
-  svg.innerHTML = `
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="6"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="6"
-      stroke-linecap="round"
-      stroke-dasharray="${filled} ${circ - filled}"
-      transform="rotate(-90 ${cx} ${cy})"
-      style="transition:stroke-dasharray .6s ease"/>`;
+function gauge(id,pct,color){
+  const el=document.getElementById(id);if(!el)return;
+  const r=28,cx=34,cy=34,c=2*Math.PI*r,f=c*Math.min(pct,100)/100;
+  el.innerHTML=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="7"/>
+<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round"
+  stroke-dasharray="${f} ${c-f}" transform="rotate(-90 ${cx} ${cy})" style="transition:stroke-dasharray .7s ease"/>`;
+}
+function gaugeStatic(id,color){
+  const el=document.getElementById(id);if(!el)return;
+  const r=28,cx=34,cy=34,c=2*Math.PI*r;
+  el.innerHTML=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="7"/>
+<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="7"
+  stroke-dasharray="${c} 0" transform="rotate(-90 ${cx} ${cy})"/>`;
 }
 
-/* keep uptime gauge always full green */
-function drawUptimeGauge() {
-  const svg = document.getElementById('g-up-svg');
-  if (!svg) return;
-  const r=28,cx=34,cy=34,circ=2*Math.PI*r;
-  svg.innerHTML=`
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="6"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--green)" stroke-width="6"
-      stroke-linecap="round" stroke-dasharray="${circ} 0" transform="rotate(-90 ${cx} ${cy})"/>`;
-}
-
-/* service icon color from name */
-function svcColor(name) {
-  const colors = ['#6366f1','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#3b82f6','#ec4899','#84cc16','#f97316'];
-  let h = 0; for (let c of name) h = (h*31 + c.charCodeAt(0)) & 0xffff;
-  return colors[h % colors.length];
-}
-
-/* ════════════
-   WORK WIDGETS
-   ════════════ */
-
-async function loadWeather() {
-  const el = document.getElementById('weather-bar-wrap');
-  try {
-    const d = await api('weather');
-    if (d.status==='unconfigured') { el.innerHTML=`<div class="empty" style="padding:0">Set <code>OPENWEATHER_API_KEY</code> in .env</div>`; return; }
-    if (d.status==='error') { el.innerHTML=`<div class="err">⚠ ${d.message}</div>`; return; }
-    el.innerHTML=`<div class="weather-bar">
-      <img class="wb-icon" src="${d.icon_url}" alt="">
-      <div class="wb-temp">${d.temp}<span class="wb-unit">${d.unit}</span></div>
-      <div class="wb-info">
-        <div class="wb-desc">${d.description} · ${d.city}</div>
-        <div class="wb-meta">
-          <div class="wb-mi">Feels <span>${d.feels_like}${d.unit}</span></div>
-          <div class="wb-mi">Humidity <span>${d.humidity}%</span></div>
-          <div class="wb-mi">Wind <span>${d.wind_speed} m/s</span></div>
+/* ═══ WORK WIDGETS ═══ */
+async function loadWeather(){
+  const el=document.getElementById('wx-wrap');
+  try{
+    const d=await api('weather');
+    if(d.status==='unconfigured'){el.innerHTML=`<div class="uncfg">Weather — configure in <button onclick="openSettings()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:.74rem;text-decoration:underline">Settings</button></div>`;return;}
+    if(d.status==='error'){el.innerHTML=`<div class="err">⚠ ${d.message}</div>`;return;}
+    el.innerHTML=`<div class="wx-bar">
+      <img class="wx-icon" src="${d.icon_url}" alt="">
+      <div class="wx-temp">${d.temp}<span class="wx-unit">${d.unit}</span></div>
+      <div class="wx-info">
+        <div class="wx-desc">${d.description} · ${d.city}</div>
+        <div class="wx-meta">
+          <div class="wx-mi">Feels <span>${d.feels_like}${d.unit}</span></div>
+          <div class="wx-mi">Humidity <span>${d.humidity}%</span></div>
+          <div class="wx-mi">Wind <span>${d.wind_speed} m/s</span></div>
         </div>
       </div>
     </div>`;
-  } catch(e) { el.innerHTML=`<div class="err">⚠ Weather unavailable</div>`; }
+  }catch(e){el.innerHTML=`<div class="err">⚠ Weather unavailable</div>`;}
 }
 
-async function loadCalendar() {
-  const el = document.getElementById('cal-body');
-  try {
-    const d = await api('calendar');
-    if (d.status==='unconfigured') { el.innerHTML=`<div class="empty">Set <code>ICAL_URL</code> in .env</div>`; return; }
-    if (d.status==='error') { el.innerHTML=`<div class="err">⚠ ${d.message}</div>`; return; }
-    if (!d.events.length) { el.innerHTML=`<div class="empty">No events in the next 2 weeks</div>`; return; }
+async function loadCalendar(){
+  const el=document.getElementById('cal-body');
+  try{
+    const d=await api('calendar');
+    if(d.status==='unconfigured'){el.innerHTML=`<div class="uncfg">Add iCal URL in <button onclick="openSettings()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:.74rem;text-decoration:underline">Settings</button></div>`;return;}
+    if(d.status==='error'){el.innerHTML=`<div class="err">⚠ ${d.message}</div>`;return;}
+    if(!d.events.length){el.innerHTML=`<div class="uncfg">No events in the next 2 weeks</div>`;return;}
     el.innerHTML=`<div class="ev-list">${d.events.map(ev=>{
       const dt=new Date(ev.start);
       const time=ev.all_day?'All day':dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-      return `<div class="ev">
-        <div class="ev-date"><div class="ev-d">${dt.getDate()}</div><div class="ev-m">${dt.toLocaleString('en',{month:'short'})}</div></div>
-        <div><div class="ev-title">${ev.title}</div><div class="ev-time">${time}${ev.location?' · '+ev.location:''}</div></div>
-      </div>`;
+      return `<div class="ev"><div class="ev-d"><div class="ev-dn">${dt.getDate()}</div><div class="ev-dm">${dt.toLocaleString('en',{month:'short'})}</div></div>
+        <div><div class="ev-title">${ev.title}</div><div class="ev-time">${time}${ev.location?' · '+ev.location:''}</div></div></div>`;
     }).join('')}</div>`;
-  } catch(e) { el.innerHTML=`<div class="err">⚠ Calendar unavailable</div>`; }
+  }catch(e){el.innerHTML=`<div class="err">⚠ Calendar unavailable</div>`;}
 }
 
-async function loadEmail() {
-  const el = document.getElementById('email-body');
-  try {
-    const d = await api('email');
-    if (d.status==='unconfigured') { el.innerHTML=`<div class="empty">Set Gmail credentials in .env<br><span style="font-size:.65rem;color:var(--t3)">See .env.example for steps</span></div>`; return; }
-    if (d.status==='error') { el.innerHTML=`<div class="err">⚠ ${d.message}</div>`; return; }
-    if (!d.messages.length) { el.innerHTML=`<div class="empty">Inbox is empty</div>`; return; }
-    el.innerHTML=`<div class="email-list">${d.messages.map(m=>`
+async function loadEmail(){
+  const el=document.getElementById('email-body');
+  try{
+    const d=await api('email');
+    if(d.status==='unconfigured'){el.innerHTML=`<div class="uncfg">Configure Gmail in <button onclick="openSettings()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:.74rem;text-decoration:underline">Settings</button></div>`;return;}
+    if(d.status==='error'){el.innerHTML=`<div class="err">⚠ ${d.message}</div>`;return;}
+    if(!d.messages.length){el.innerHTML=`<div class="uncfg">Inbox is empty</div>`;return;}
+    el.innerHTML=`<div class="em-list">${d.messages.map(m=>`
       <div class="em ${m.unread?'unread':''}">
         <div class="em-from">${m.from}</div>
-        <div class="em-subject">${m.subject}</div>
+        <div class="em-subj">${m.subject}</div>
         <div class="em-date">${m.date}</div>
       </div>`).join('')}</div>`;
-  } catch(e) { el.innerHTML=`<div class="err">⚠ Email unavailable</div>`; }
+  }catch(e){el.innerHTML=`<div class="err">⚠ Email unavailable</div>`;}
 }
 
-/* ═══════════════
-   HOMELAB WIDGETS
-   ═══════════════ */
+/* ── TODOS ── */
+let todos=[];
+async function loadTodos(){
+  try{const d=await api('config');todos=d.todos?.items||[];}catch(e){todos=[];}
+  renderTodos();
+}
+function renderTodos(){
+  const el=document.getElementById('todo-list');
+  if(!todos.length){el.innerHTML=`<div class="uncfg">No tasks yet — add one above</div>`;return;}
+  el.innerHTML=todos.map((t,i)=>`
+    <div class="todo-item">
+      <div class="todo-cb ${t.done?'done':''}" onclick="toggleTodo(${i})"></div>
+      <span class="todo-text ${t.done?'done':''}" onclick="toggleTodo(${i})">${t.text}</span>
+      <button class="todo-del" onclick="deleteTodo(${i})">✕</button>
+    </div>`).join('');
+}
+async function saveTodos(){
+  try{await api('config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({todos:{items:todos}})});}catch(e){}
+}
+function addTodo(){
+  const inp=document.getElementById('todo-input');
+  const text=inp.value.trim();if(!text)return;
+  todos.push({text,done:false});inp.value='';
+  renderTodos();saveTodos();
+}
+function toggleTodo(i){todos[i].done=!todos[i].done;renderTodos();saveTodos();}
+function deleteTodo(i){todos.splice(i,1);renderTodos();saveTodos();}
 
-async function loadProxmox() {
-  try {
-    const d = await api('proxmox/node');
-    if (d.status==='error') {
-      ['g-cpu-val','g-ram-val','g-disk-val','g-up-val'].forEach(id=>{ const e=document.getElementById(id); if(e)e.textContent='ERR'; });
+/* ═══ HOMELAB WIDGETS ═══ */
+async function loadProxmox(){
+  try{
+    const d=await api('proxmox/node');
+    if(d.status==='unconfigured'){
+      ['gc1','gc2','gc3','gc4'].forEach((id,i)=>gaugeStatic(id,'var(--t3)'));
+      ['gv1','gv2','gv3','gv4'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='—';e.style.color='var(--t3)';}});
+      document.getElementById('gs1').innerHTML=`<button onclick="openSettings()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:.62rem;text-decoration:underline">Configure</button>`;
       return;
     }
-    // CPU gauge
-    drawGauge('g-cpu-svg', d.cpu, pctColor(d.cpu));
-    document.getElementById('g-cpu-val').textContent = d.cpu + '%';
-    document.getElementById('g-cpu-val').style.color = pctColor(d.cpu);
-    document.getElementById('g-cpu-sub').textContent = 'of all cores';
+    if(d.status==='error'){
+      ['gc1','gc2','gc3','gc4'].forEach(id=>gaugeStatic(id,'var(--red)'));
+      ['gv1','gv2','gv3','gv4'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='ERR';e.style.color='var(--red)';}});
+      document.getElementById('gs1').textContent=d.message.substring(0,40)+'…';
+      return;
+    }
+    gauge('gc1',d.cpu,pctColor(d.cpu));
+    document.getElementById('gv1').textContent=d.cpu+'%';
+    document.getElementById('gv1').style.color=pctColor(d.cpu);
+    document.getElementById('gs1').textContent='all cores';
 
-    // RAM gauge
-    drawGauge('g-ram-svg', d.memory.percent, pctColor(d.memory.percent));
-    document.getElementById('g-ram-val').textContent = d.memory.percent + '%';
-    document.getElementById('g-ram-val').style.color = pctColor(d.memory.percent);
-    document.getElementById('g-ram-sub').textContent = fmtBytes(d.memory.used)+' / '+fmtBytes(d.memory.total);
+    gauge('gc2',d.memory.percent,pctColor(d.memory.percent));
+    document.getElementById('gv2').textContent=d.memory.percent+'%';
+    document.getElementById('gv2').style.color=pctColor(d.memory.percent);
+    document.getElementById('gs2').textContent=fmtBytes(d.memory.used)+' / '+fmtBytes(d.memory.total);
 
-    // Disk gauge
-    drawGauge('g-disk-svg', d.disk.percent, pctColor(d.disk.percent));
-    document.getElementById('g-disk-val').textContent = d.disk.percent + '%';
-    document.getElementById('g-disk-val').style.color = pctColor(d.disk.percent);
-    document.getElementById('g-disk-sub').textContent = fmtBytes(d.disk.used)+' / '+fmtBytes(d.disk.total);
+    gauge('gc3',d.disk.percent,pctColor(d.disk.percent));
+    document.getElementById('gv3').textContent=d.disk.percent+'%';
+    document.getElementById('gv3').style.color=pctColor(d.disk.percent);
+    document.getElementById('gs3').textContent=fmtBytes(d.disk.used)+' / '+fmtBytes(d.disk.total);
 
-    // Uptime
-    drawUptimeGauge();
-    const ut = fmtUptime(d.uptime).split(' ');
-    document.getElementById('g-up-val').textContent = ut[0];
-    document.getElementById('g-up-sub').textContent = ut[1] || '';
-
-  } catch(e) { console.warn('Proxmox node error:', e); }
+    gaugeStatic('gc4','var(--green)');
+    const up=fmtUp(d.uptime).split(' ');
+    document.getElementById('gv4').textContent=up[0];
+    document.getElementById('gs4').textContent=up[1]||'online';
+  }catch(e){console.warn(e);}
 }
 
-async function loadVMs() {
-  const el = document.getElementById('vm-table-wrap');
-  try {
-    const d = await api('proxmox/vms');
-    if (d.status==='error') { el.innerHTML=`<div class="err" style="margin:0">⚠ ${d.message}</div>`; return; }
-    if (!d.vms.length) { el.innerHTML=`<div class="empty">No VMs or containers found</div>`; return; }
-    el.innerHTML=`<div class="vm-table-wrap">
-      <table class="vm-table">
-        <thead><tr>
-          <th>Type</th><th>ID</th><th>Name</th><th>Status</th><th>CPU</th><th>Memory</th>
-        </tr></thead>
-        <tbody>${d.vms.map(vm=>{
-          const memPct = vm.maxmem>0?Math.round(vm.mem/vm.maxmem*100):0;
-          return `<tr>
-            <td><span class="type-badge ${vm.type}">${vm.type.toUpperCase()}</span></td>
-            <td style="font-family:var(--mono);color:var(--t3);font-size:.75rem">${vm.id}</td>
-            <td style="font-weight:500">${vm.name}</td>
-            <td><span class="status-pill"><span class="vdot ${vm.status}"></span><span style="color:var(--t2)">${vm.status}</span></span></td>
-            <td style="font-family:var(--mono);font-size:.75rem">
-              ${vm.status==='running'?`<span style="color:${pctColor(vm.cpu)}">${vm.cpu}%</span><span class="mini-bar"><span class="mini-bar-fill" style="width:${Math.min(vm.cpu,100)}%"></span></span>`:'—'}
-            </td>
-            <td style="font-family:var(--mono);font-size:.75rem">
-              ${vm.status==='running'&&vm.maxmem>0?`<span style="color:${pctColor(memPct)}">${memPct}%</span> <span style="color:var(--t3)">${fmtBytes(vm.mem)}</span>`:'—'}
-            </td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table>
-    </div>`;
-  } catch(e) { el.innerHTML=`<div class="err" style="margin:0">⚠ VM data unavailable</div>`; }
+async function loadVMs(){
+  const el=document.getElementById('vm-wrap');
+  try{
+    const d=await api('proxmox/vms');
+    if(d.status==='unconfigured'){el.innerHTML=`<div class="uncfg">Configure Proxmox in <button onclick="openSettings()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:.74rem;text-decoration:underline">Settings</button></div>`;return;}
+    if(d.status==='error'){el.innerHTML=`<div class="err">⚠ ${d.message}</div>`;return;}
+    if(!d.vms.length){el.innerHTML=`<div class="uncfg">No VMs or containers found</div>`;return;}
+    el.innerHTML=`<div class="vm-wrap"><table class="vm-tbl">
+      <thead><tr><th>Type</th><th>ID</th><th>Name</th><th>Status</th><th>CPU</th><th>Memory</th></tr></thead>
+      <tbody>${d.vms.map(v=>{
+        const mp=v.maxmem>0?Math.round(v.mem/v.maxmem*100):0;
+        return `<tr>
+          <td><span class="badge ${v.type}">${v.type.toUpperCase()}</span></td>
+          <td style="font-family:var(--mono);color:var(--t3);font-size:.74rem">${v.id}</td>
+          <td style="font-weight:500">${v.name}</td>
+          <td><span class="vpill"><span class="vdot ${v.status}"></span><span style="color:var(--t2)">${v.status}</span></span></td>
+          <td style="font-family:var(--mono);font-size:.74rem">
+            ${v.status==='running'?`<span style="color:${pctColor(v.cpu)}">${v.cpu}%</span><span class="mbar"><span class="mbar-f" style="width:${Math.min(v.cpu,100)}%"></span></span>`:'—'}
+          </td>
+          <td style="font-family:var(--mono);font-size:.74rem">
+            ${v.status==='running'&&v.maxmem>0?`<span style="color:${pctColor(mp)}">${mp}%</span> <span style="color:var(--t3)">${fmtBytes(v.mem)}</span>`:'—'}
+          </td>
+        </tr>`;
+      }).join('')}</tbody></table></div>`;
+  }catch(e){el.innerHTML=`<div class="err">⚠ VM data unavailable</div>`;}
 }
 
-async function loadServices() {
-  const el = document.getElementById('svc-grid');
-  try {
-    const d = await api('health');
-    if (d.status==='unconfigured') { el.innerHTML=`<div class="empty">Set <code>SERVICES</code> in .env</div>`; return; }
-    if (!d.services.length) { el.innerHTML=`<div class="empty">No services configured</div>`; return; }
-    el.innerHTML=`<div class="services-grid">${d.services.map(s=>`
+async function loadServices(){
+  const el=document.getElementById('svc-grid');
+  try{
+    const d=await api('health');
+    if(d.status==='unconfigured'){el.innerHTML=`<div class="uncfg">Add services in <button onclick="openSettings()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:.74rem;text-decoration:underline">Settings</button></div>`;return;}
+    if(!d.services.length){el.innerHTML=`<div class="uncfg">No services configured</div>`;return;}
+    el.innerHTML=`<div class="svc-grid">${d.services.map(s=>`
       <div class="svc-card">
         <div class="svc-icon" style="background:${svcColor(s.name)}">${s.name.charAt(0).toUpperCase()}</div>
-        <div class="svc-info">
+        <div style="flex:1;min-width:0">
           <div class="svc-name">${s.name}</div>
-          <div class="svc-ms" style="color:${s.status==='up'?'var(--green)':'var(--red)'}">
-            ${s.status==='up'?s.response_ms+' ms':(s.reason||'offline')}
-          </div>
+          <div class="svc-ms" style="color:${s.status==='up'?'var(--green)':'var(--red)'}">${s.status==='up'?s.response_ms+' ms':(s.reason||'offline')}</div>
         </div>
         <div class="svc-dot ${s.status}"></div>
       </div>`).join('')}</div>`;
-  } catch(e) { el.innerHTML=`<div class="err">⚠ Services unavailable</div>`; }
+  }catch(e){el.innerHTML=`<div class="err">⚠ Services unavailable</div>`;}
 }
 
-async function loadFeeds() {
-  const el = document.getElementById('news-grid');
-  try {
-    const d = await api('feeds');
-    if (d.status==='unconfigured') { el.innerHTML=`<div class="empty">Set <code>RSS_FEEDS</code> in .env</div>`; return; }
-    if (!d.articles.length) { el.innerHTML=`<div class="empty">No articles loaded</div>`; return; }
+async function loadFeeds(){
+  const el=document.getElementById('news-grid');
+  try{
+    const d=await api('feeds');
+    if(d.status==='unconfigured'){el.innerHTML=`<div class="uncfg">Add RSS feeds in <button onclick="openSettings()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:.74rem;text-decoration:underline">Settings</button></div>`;return;}
+    if(!d.articles.length){el.innerHTML=`<div class="uncfg">No articles loaded</div>`;return;}
     el.innerHTML=`<div class="news-grid">${d.articles.map(a=>`
-      <a class="news-card" href="${a.link}" target="_blank" rel="noopener">
-        <div class="news-src">${a.source}</div>
-        <div class="news-title">${a.title}</div>
+      <a class="nc" href="${a.link}" target="_blank" rel="noopener">
+        <div class="nc-src">${a.source}</div>
+        <div class="nc-title">${a.title}</div>
       </a>`).join('')}</div>`;
-  } catch(e) { el.innerHTML=`<div class="err">⚠ Feeds unavailable</div>`; }
+  }catch(e){el.innerHTML=`<div class="err">⚠ Feeds unavailable</div>`;}
 }
 
-/* ── BOOT ── */
-// Work page
-loadWeather(); loadCalendar(); loadEmail();
-// Homelab page
-loadProxmox(); loadVMs(); loadServices(); loadFeeds();
+/* ═══ SETTINGS ═══ */
+function openSettings(){
+  document.getElementById('overlay').classList.add('open');
+  loadConfigIntoForm();
+}
+function closeSettings(){document.getElementById('overlay').classList.remove('open');}
 
-// Refresh intervals
-setInterval(loadProxmox,   15_000);
-setInterval(loadVMs,       30_000);
-setInterval(loadServices,  30_000);
-setInterval(loadEmail,    120_000);
-setInterval(loadWeather,  600_000);
-setInterval(loadCalendar, 300_000);
-setInterval(loadFeeds,   1800_000);
+function toggleSection(id){
+  const body=document.getElementById('sb-'+id);
+  const arrow=document.getElementById('ar-'+id);
+  if(!body)return;
+  body.classList.toggle('open');
+  if(arrow)arrow.textContent=body.classList.contains('open')?'▼':'▶';
+}
+
+async function loadConfigIntoForm(){
+  try{
+    const c=await api('config');
+    const px=c.proxmox||{};
+    setVal('px-host',px.host);setVal('px-port',px.port||8006);setVal('px-node',px.node||'pve');
+    setVal('px-user',px.user||'root@pam');setVal('px-pass',px.password);
+    setVal('px-ssl',String(px.verify_ssl||false));
+    setStat('proxmox',px.host&&px.password);
+
+    const wx=c.weather||{};
+    setVal('wx-key',wx.api_key);setVal('wx-city',wx.city);setVal('wx-units',wx.units||'metric');
+    setStat('weather',wx.api_key&&wx.city);
+
+    const cal=c.calendar||{};
+    setVal('cal-url',cal.ical_url);
+    setStat('calendar',cal.ical_url);
+
+    const svc=c.services||{};
+    setVal('svc-list',(svc.list||'').replace(/,/g,'\n'));
+    setStat('services',svc.list);
+
+    const fd=c.feeds||{};
+    setVal('rss-urls',(fd.urls||'').replace(/,/g,'\n'));
+    setStat('feeds',fd.urls);
+
+    const gm=c.gmail||{};
+    setVal('gm-id',gm.client_id);setVal('gm-sec',gm.client_secret);setVal('gm-tok',gm.refresh_token);
+    setStat('gmail',gm.client_id&&gm.refresh_token);
+  }catch(e){}
+}
+
+function setVal(id,val){const e=document.getElementById(id);if(e&&val!==undefined&&val!==null)e.value=val;}
+function setStat(id,ok){
+  const e=document.getElementById('st-'+id);
+  if(!e)return;
+  e.textContent=ok?'✓ Configured':'Not configured';
+  e.className='ss-status '+(ok?'ok':'no');
+}
+function getVal(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+
+async function saveSettings(){
+  const cfg={
+    proxmox:{host:getVal('px-host'),port:parseInt(getVal('px-port'))||8006,node:getVal('px-node'),
+      user:getVal('px-user'),password:getVal('px-pass'),verify_ssl:getVal('px-ssl')==='true'},
+    weather:{api_key:getVal('wx-key'),city:getVal('wx-city'),units:getVal('wx-units')},
+    calendar:{ical_url:getVal('cal-url')},
+    services:{list:getVal('svc-list').replace(/\n/g,',').replace(/,+/g,',').replace(/^,|,$/g,'')},
+    feeds:{urls:getVal('rss-urls').replace(/\n/g,',').replace(/,+/g,',').replace(/^,|,$/g,'')},
+    gmail:{client_id:getVal('gm-id'),client_secret:getVal('gm-sec'),refresh_token:getVal('gm-tok')},
+  };
+  try{
+    await api('config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cfg)});
+    const msg=document.getElementById('save-msg');
+    msg.style.display='inline';setTimeout(()=>msg.style.display='none',2500);
+    // Reload all widgets with new config
+    loadWeather();loadCalendar();loadEmail();loadProxmox();loadVMs();loadServices();loadFeeds();
+    loadConfigIntoForm();
+  }catch(e){alert('Save failed: '+e.message);}
+}
+
+/* ═══ BOOT ═══ */
+loadWeather();loadCalendar();loadEmail();loadTodos();
+loadProxmox();loadVMs();loadServices();loadFeeds();
+
+setInterval(loadProxmox,  15_000);
+setInterval(loadVMs,      30_000);
+setInterval(loadServices, 30_000);
+setInterval(loadEmail,   120_000);
+setInterval(loadWeather, 600_000);
+setInterval(loadCalendar,300_000);
+setInterval(loadFeeds,  1800_000);
 </script>
 </body>
 </html>
